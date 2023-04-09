@@ -15,6 +15,13 @@ export type DraggableListProps = {
 export type TodoStates = 'new' | 'onprogress' | 'done'
 
 export type StateChangePayload = {
-    id: string,
-    state: TodoStates | string
+    sourceId: TodoStates | string,
+    sourceIndex: number,
+    destinationId: TodoStates | string,
+    destIndex: number,
+}
+
+export type DeleteTodoPayload = {
+    index: number,
+    todoType: TodoStates | string
 }

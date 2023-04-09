@@ -6,17 +6,21 @@ import { ITodo, TodoStates } from "@/types";
 
 export function useTodos(todoState: TodoStates) {
     const screenState = useSelector((state: RootState) => state.todos);
-    const [items, setItems] = useState<ITodo[]>([])
 
-    useEffect(() => {
-        let todoList: ITodo[] = []
-        screenState.todos.filter((value, index) => {
-            if (value.state == todoState) {
-                todoList.push(value)
-            }
-        })
-        setItems(todoList)
-    }, [todoState, screenState.todos])
+    var items: ITodo[] = [] 
+    switch (todoState) {
+        case 'new':
+            items = screenState.newTodos;
+            break;
+        case 'onprogress':
+            items = screenState.onProgressTodos;
+            break;
+        case 'done':
+            items = screenState.doneTodos;
+            break;
+        default:
+            break;
+    }
 
     return { items }
 

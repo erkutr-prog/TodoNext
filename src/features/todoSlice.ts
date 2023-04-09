@@ -1,35 +1,40 @@
-import { ITodo, StateChangePayload } from "@/types"
+import { DeleteTodoPayload, ITodo, StateChangePayload } from "@/types"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
-
 export type TodoState = {
-    todos: ITodo[]
+    newTodos: ITodo[],
+    onProgressTodos: ITodo[],
+    doneTodos: ITodo[]
 }
 
 const initialState: TodoState = {
-    todos: [
+    newTodos: [
         {
             id: '0',
             header: 'Todo 1',
             description: 'Some things 1',
             state: 'new'
         },
+    ],
+    onProgressTodos: [
         {
             id: '1',
             header: 'Todo 2',
-            description: 'Some things 1',
+            description: 'Some things 2',
             state: 'onprogress'
         },
+    ],
+    doneTodos: [
         {
             id: '2',
             header: 'Todo 3',
-            description: 'Some things 1',
+            description: 'Some things 3',
             state: 'done'
         },
         {
             id: '3',
             header: 'Todo 4',
-            description: 'Some things 1',
+            description: 'Some things 4',
             state: 'done'
         },
     ]
@@ -40,19 +45,37 @@ const todoSlice = createSlice({
     initialState: initialState,
     reducers: {
         addTodo(state, action: PayloadAction<ITodo>) {
-            state.todos.push(action.payload);
-        },
-        deleteTodo(state, action: PayloadAction<ITodo>) {
-            state.todos.forEach((value, index) => {
-                if (value.id == action.payload.id) delete state.todos[index]
-            })
+            state.newTodos.push(action.payload);
         },
         changeTodoState(state, action: PayloadAction<StateChangePayload>) {
-            state.todos.forEach((value, index) => {
-                if (value.id == action.payload.id) {
-                    state.todos[index].state = action.payload.state
-                }
-            })
+            var draggedItem: ITodo[] = [];
+            switch (action.payload.sourceId) {
+                case 'new':
+                    draggedItem = state.newTodos.splice(action.payload.sourceIndex, 1)
+                    break;
+                case 'onprogress':
+                    draggedItem = state.onProgressTodos.splice(action.payload.sourceIndex, 1)
+                    break;
+                case 'done':
+                    draggedItem = state.doneTodos.splice(action.payload.sourceIndex, 1)
+                    break;
+                default:
+                    break;
+            }
+            draggedItem[0].state = action.payload.destinationId;
+            switch (action.payload.destinationId) {
+                case 'new':
+                    state.newTodos.splice(action.payload.destIndex, 0, draggedItem[0]);
+                    break;
+                case 'onprogress':
+                    state.onProgressTodos.splice(action.payload.destIndex, 0, draggedItem[0])
+                    break;
+                case 'done':
+                    state.doneTodos.splice(action.payload.destIndex, 0, draggedItem[0])
+                    break;
+                default:
+                    break;
+            }
         }
     }, 
     extraReducers: {}
@@ -60,7 +83,6 @@ const todoSlice = createSlice({
 
 export const {
     addTodo,
-    deleteTodo,
     changeTodoState
 } = todoSlice.actions
 
