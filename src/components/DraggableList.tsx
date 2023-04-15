@@ -1,4 +1,4 @@
-import { ITodo, TodoStates } from '@/types';
+import { IStyles, ITodo, TodoStates } from '@/types';
 import React from 'react'
 import {
     DragDropContext,
@@ -8,10 +8,6 @@ import {
 import DraggableListItem from './DraggableListItem';
 import { useTodos } from '@/hooks/useTodos';
 import { Box, SxProps, Theme, Typography } from '@mui/material';
-
-interface IStyles {
-    [key: string]: SxProps<Theme>;
-}
 
 export type DraggableListProps = {
     todoType: TodoStates,
@@ -42,7 +38,8 @@ const styles: IStyles = {
     container: () => ({
         minHeight: '300px',
         borderRadius: 12,
-        margin: 5
+        margin: 5,
+        minWidth: '15vw'
     })
 }
 

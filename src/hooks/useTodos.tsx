@@ -1,6 +1,6 @@
 import { useEffect, useState, } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from './../pages/app/store';
+import { AppDispatch, RootState } from '../store';
 import { ITodo, TodoStates } from "@/types";
 
 

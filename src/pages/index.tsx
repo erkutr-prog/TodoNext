@@ -1,9 +1,23 @@
 import Head from 'next/head'
-import { Box, SxProps, Theme, Toolbar } from '@mui/material'
+import { Box, SxProps, Theme, Toolbar, keyframes, makeStyles } from '@mui/material'
 import CustomAppBar from '@/components/CustomAppBar'
 import { Provider } from 'react-redux'
 import TodoContent from '@/components/TodoContent'
-import store from './app/store'
+import store from '../store'
+import { initializeApp } from 'firebase/app'
+import { useEffect, useState } from 'react'
+import Login from '@/components/Login'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { IStyles } from '@/types'
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDERID,
+  appId: process.env.NEXT_PUBLIC_APPID
+};
 
 const UIOverlay = () => {
   return (
@@ -12,8 +26,36 @@ const UIOverlay = () => {
     </Box>
   )
 }
+const spin = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
 
 export default function Home() {
+  const [isLoading, setLoading] = useState(true)
+  const [isLoggedIn, setLoggedIn] = useState(false)
+
+  const app = initializeApp(firebaseConfig)
+
+  useEffect(() => {
+    const auth = getAuth()
+    const subscriber = onAuthStateChanged(auth,userState => {
+      if (userState) {
+        setLoggedIn(true)
+        setLoading(false)
+      } else {
+        setLoggedIn(false)
+        setLoading(false)
+      }
+    })
+    return subscriber
+  }, [])
+
+
   return (
     <>
       <Head>
@@ -24,18 +66,37 @@ export default function Home() {
       </Head>
       <main id='layout'>
         <Provider store={store}>
-          <UIOverlay/>
-          <Toolbar/>
-          <TodoContent/>
+          {isLoading ?
+            <Box sx={{display: 'grid', justifyContent: 'center', alignItems: 'center', height: '350px'}}>
+          <Box
+            sx={{
+              animation: `${spin} 1s infinite ease`,
+              width: '50px',
+              height: '50px',
+              border: '10px solid #f3f3f3',
+              borderTop: '10px solid #383636',
+              borderRadius: '50%' 
+            }}
+          >
+          </Box>
+            </Box>
+        : 
+        <>
+          {isLoggedIn ?
+                    <>
+                    <UIOverlay/>
+                    <Toolbar/>
+                    <TodoContent/>
+                    </>
+                    :
+                    <Login loginCb={() => setLoggedIn(true)}/>  
+        }
+        </>
+        }
         </Provider>
       </main>
     </>
   )
-}
-
-
-interface IStyles {
-  [key: string]: SxProps<Theme>;
 }
 
 const styles: IStyles = {

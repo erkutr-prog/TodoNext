@@ -9,7 +9,7 @@ import InboxIcon from '@mui/icons-material/Inbox'
 import { colors } from "@/assets/colors";
 import { useTodoState } from "@/hooks/useTodoState";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/pages/app/store";
+import { RootState } from "@/store";
 
 
 type Props = {

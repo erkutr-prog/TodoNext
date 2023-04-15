@@ -1,18 +1,16 @@
 import { Box, Container, SxProps, Theme, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Paper from "@mui/material/Paper";
-import { ITodo, TodoStates } from "@/types";
+import { IStyles, ITodo, TodoStates } from "@/types";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import dynamic from "next/dynamic";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/pages/app/store";
+import { AppDispatch } from "@/store";
 import { changeTodoState } from "@/features/todoSlice";
+import { getAuth, signOut } from "firebase/auth";
 
 const todoTypes: TodoStates[] = ["new", "onprogress", "done"];
 
-interface IStyles {
-  [key: string]: SxProps<Theme>;
-}
 const DraggableList = dynamic(() => import("./DraggableList"), { ssr: false });
 
 type Props = {};
@@ -20,6 +18,11 @@ type Props = {};
 function TodoContent({}: Props) {
   const [winReady, setWinReady] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+
+  const signout = async() => {
+    const auth = await getAuth()
+    await signOut(auth)
+  }
 
   useEffect(() => {
     setWinReady(true);
@@ -62,16 +65,16 @@ const styles: IStyles = {
   container: (theme: Theme) => ({
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: 'center',
     alignSelf: "center",
     alignItems: "center",
-    width: "100vw",
-    paddingX: 30,
+    padding: 5,
+    width: 1
   }),
   flexPaper: () => ({
-    flex: 1,
+    flex: 1 / 3,
     margin: 5,
     alignSelf: "center",
-    backgroundColor: "#FAF7F0",
+    backgroundColor: "#fff",
   }),
 };

@@ -1,3 +1,4 @@
+import { SxProps, Theme } from "@mui/material"
 import { OnDragEndResponder } from "react-beautiful-dnd"
 
 export interface ITodo {
@@ -24,4 +25,18 @@ export type StateChangePayload = {
 export type DeleteTodoPayload = {
     index: number,
     todoType: TodoStates | string
+}
+
+export interface CredentialAction {
+    type: 'setMail' | 'setPassword',
+    payload: string
+}
+
+export interface CredentialState {
+    mail: string,
+    password: string
+}
+
+export interface IStyles {
+    [key: string]: SxProps<Theme>;
 }

@@ -272,3 +272,54 @@
     transform: rotate(0deg);
   }
 }
+
+
+.login-container {
+  position: relative;
+  height: 100vh;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('./../assets//images/LoginBackground.jpg'); /* Replace with your background image URL */
+  background-size: cover;
+  filter: blur(8px); /* Apply the blur effect to the background image */
+}
+
+.login-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.login-form {
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-header {
+  margin-top: 0;
+}
+
+.login-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
