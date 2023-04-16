@@ -1,27 +1,26 @@
-import { useEffect, useState, } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from '../store';
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../store";
 import { ITodo, TodoStates } from "@/types";
-
+import { fetchTodos } from "@/utils/Storage";
+import { setTodos } from "@/features/todoSlice";
+import { useEffect, useState } from "react";
 
 export function useTodos(todoState: TodoStates) {
-    const screenState = useSelector((state: RootState) => state.todos);
+  const dispatch = useDispatch<AppDispatch>();
+  const [loading, setLoading] = useState<Boolean>(true)
+  const [data, setData] = useState<ITodo[]>()
 
-    var items: ITodo[] = [] 
-    switch (todoState) {
-        case 'new':
-            items = screenState.newTodos;
-            break;
-        case 'onprogress':
-            items = screenState.onProgressTodos;
-            break;
-        case 'done':
-            items = screenState.doneTodos;
-            break;
-        default:
-            break;
-    }
+  const getTodoList = async() => {
+    setLoading(true)
+    const response = await fetchTodos(todoState);
+    dispatch(setTodos({ state: todoState, todo: response }));
+    setData(response)
+    setLoading(false)
+  }
 
-    return { items }
+  useEffect(() => {
+    getTodoList()
+  }, [todoState])
 
+  return {data, loading};
 }

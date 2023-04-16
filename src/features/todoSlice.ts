@@ -1,4 +1,4 @@
-import { DeleteTodoPayload, ITodo, StateChangePayload } from "@/types"
+import { DeleteTodoPayload, ITodo, SetTodoPayload, StateChangePayload } from "@/types"
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 export type TodoState = {
@@ -76,6 +76,21 @@ const todoSlice = createSlice({
                 default:
                     break;
             }
+        },
+        setTodos(state, action: PayloadAction<SetTodoPayload>) {
+            switch(action.payload.state) {
+                case 'new':
+                    state.newTodos = action.payload.todo
+                    break
+                case 'onprogress':
+                    state.onProgressTodos = action.payload.todo;
+                    break
+                case 'done':
+                    state.doneTodos = action.payload.todo;
+                    break
+                default:
+                    break
+            }
         }
     }, 
     extraReducers: {}
@@ -83,7 +98,8 @@ const todoSlice = createSlice({
 
 export const {
     addTodo,
-    changeTodoState
+    changeTodoState,
+    setTodos
 } = todoSlice.actions
 
 export default todoSlice.reducer

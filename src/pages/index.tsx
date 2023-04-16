@@ -1,5 +1,12 @@
 import Head from 'next/head'
-import { Box, SxProps, Theme, Toolbar, keyframes, makeStyles } from '@mui/material'
+import {
+  Box,
+  SxProps,
+  Theme,
+  Toolbar,
+  keyframes,
+  makeStyles,
+} from '@mui/material'
 import CustomAppBar from '@/components/CustomAppBar'
 import { Provider } from 'react-redux'
 import TodoContent from '@/components/TodoContent'
@@ -9,6 +16,10 @@ import { useEffect, useState } from 'react'
 import Login from '@/components/Login'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { IStyles } from '@/types'
+import { getDefaultLibFileName } from 'typescript'
+import { getFirestore } from 'firebase/firestore'
+import { fetchTodos } from '@/utils/Storage'
+import Spinner from '@/components/Spinner'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,13 +27,17 @@ const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
   storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDERID,
-  appId: process.env.NEXT_PUBLIC_APPID
-};
+  appId: process.env.NEXT_PUBLIC_APPID,
+}
+
+const app = initializeApp(firebaseConfig)
+
+export const db = getFirestore(app)
 
 const UIOverlay = () => {
   return (
     <Box sx={styles.overlay}>
-      <CustomAppBar/>
+      <CustomAppBar />
     </Box>
   )
 }
@@ -33,17 +48,15 @@ const spin = keyframes`
   to {
     transform: rotate(360deg);
   }
-`;
+`
 
 export default function Home() {
   const [isLoading, setLoading] = useState(true)
   const [isLoggedIn, setLoggedIn] = useState(false)
 
-  const app = initializeApp(firebaseConfig)
-
   useEffect(() => {
     const auth = getAuth()
-    const subscriber = onAuthStateChanged(auth,userState => {
+    const subscriber = onAuthStateChanged(auth, (userState) => {
       if (userState) {
         setLoggedIn(true)
         setLoading(false)
@@ -55,7 +68,6 @@ export default function Home() {
     return subscriber
   }, [])
 
-
   return (
     <>
       <Head>
@@ -64,35 +76,30 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main id='layout'>
+      <main id="layout">
         <Provider store={store}>
-          {isLoading ?
-            <Box sx={{display: 'grid', justifyContent: 'center', alignItems: 'center', height: '350px'}}>
-          <Box
-            sx={{
-              animation: `${spin} 1s infinite ease`,
-              width: '50px',
-              height: '50px',
-              border: '10px solid #f3f3f3',
-              borderTop: '10px solid #383636',
-              borderRadius: '50%' 
-            }}
-          >
-          </Box>
-            </Box>
-        : 
-        <>
-          {isLoggedIn ?
-                    <>
-                    <UIOverlay/>
-                    <Toolbar/>
-                    <TodoContent/>
-                    </>
-                    :
-                    <Login loginCb={() => setLoggedIn(true)}/>  
-        }
-        </>
-        }
+          {isLoading ? (
+            <Spinner
+              style={{
+                display: 'grid',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '350px',
+              }}
+            />
+          ) : (
+            <>
+              {isLoggedIn ? (
+                <>
+                  <UIOverlay />
+                  <Toolbar />
+                  <TodoContent />
+                </>
+              ) : (
+                <Login loginCb={() => setLoggedIn(true)} />
+              )}
+            </>
+          )}
         </Provider>
       </main>
     </>
@@ -102,7 +109,7 @@ export default function Home() {
 const styles: IStyles = {
   overlay: (theme: Theme) => ({
     display: 'flex',
-    position: "fixed",
+    position: 'fixed',
     width: '100%',
-  })
+  }),
 }

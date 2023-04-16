@@ -15,6 +15,11 @@ export type DraggableListProps = {
 
 export type TodoStates = 'new' | 'onprogress' | 'done'
 
+export type SetTodoPayload = {
+    state: TodoStates,
+    todo: ITodo[]
+}
+
 export type StateChangePayload = {
     sourceId: TodoStates | string,
     sourceIndex: number,
@@ -39,4 +44,9 @@ export interface CredentialState {
 
 export interface IStyles {
     [key: string]: SxProps<Theme>;
+}
+
+export interface AddTodoAction {
+    type: 'setHeader' | 'setDescription' | 'setId',
+    payload: string
 }
