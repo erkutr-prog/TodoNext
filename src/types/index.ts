@@ -3,6 +3,7 @@ import { OnDragEndResponder } from "react-beautiful-dnd"
 
 export interface ITodo {
     id: string,
+    docId: string,
     header: string,
     description: string,
     state: TodoStates | string

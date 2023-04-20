@@ -1,15 +1,12 @@
-import { ITodo, TodoStates } from "@/types";
+import { ITodo } from "@/types";
 import { Avatar, Box, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import NotStartedIcon from '@mui/icons-material/NotStarted';
 import BeenhereIcon from '@mui/icons-material/Beenhere';
-import InboxIcon from '@mui/icons-material/Inbox'
 import { colors } from "@/assets/colors";
 import { useTodoState } from "@/hooks/useTodoState";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store";
 
 
 type Props = {
@@ -19,9 +16,8 @@ type Props = {
 
 export default function DraggableListItem({ item, index }: Props) {
   const {itemState} = useTodoState(item.state, item.id);
-
   return (
-    <Draggable key={item.id} draggableId={item.id} index={index}>
+    <Draggable key={item.docId} draggableId={item.docId} index={index}>
       {(provided, snapshot) => (
         <Box sx={{ backgroundColor: colors[itemState !== undefined ? itemState : 'new'], borderRadius: 4, borderWidth: 0.3, borderColor: '#000'}}>
             <ListItem

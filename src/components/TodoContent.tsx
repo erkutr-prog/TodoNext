@@ -1,15 +1,14 @@
 import {
+  Alert,
   Box,
   Button,
-  Container,
   Modal,
-  SxProps,
+  Snackbar,
   Theme,
-  Typography,
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Paper from '@mui/material/Paper'
-import { IStyles, ITodo, TodoStates } from '@/types'
+import { IStyles, TodoStates } from '@/types'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import dynamic from 'next/dynamic'
 import { useDispatch } from 'react-redux'
@@ -17,6 +16,7 @@ import { AppDispatch } from '@/store'
 import { changeTodoState } from '@/features/todoSlice'
 import { getAuth, signOut } from 'firebase/auth'
 import ModalForm from './ModalForm'
+import { changeTodoStateInServer } from '@/utils/Storage'
 
 const todoTypes: TodoStates[] = ['new', 'onprogress', 'done']
 
@@ -25,13 +25,23 @@ const DraggableList = dynamic(() => import('./DraggableList'), { ssr: false })
 type Props = {}
 
 function TodoContent({}: Props) {
-  const [winReady, setWinReady] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
+  const [winReady, setWinReady] = useState(false)
+  const [refresh, setRefresh] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
-  const toggleModal = () => setAddModalOpen(!addModalOpen)
+  const [alertOpen, setAlertOpen] = useState(false);
+  const toggleModal = (response?: Boolean) => {
+    setAddModalOpen(!addModalOpen)
+    if (response !== undefined && !response) {
+      setAlertOpen(true)
+    }
+    if (addModalOpen) {
+      setRefresh(!refresh)
+    }
+  }
 
   const signout = async () => {
-    const auth = await getAuth()
+    const auth = getAuth()
     await signOut(auth)
   }
 
@@ -39,7 +49,7 @@ function TodoContent({}: Props) {
     setWinReady(true)
   }, [])
 
-  const onDragEnd = ({ destination, source, draggableId }: DropResult) => {
+  const onDragEnd = async({ destination, source, draggableId }: DropResult) => {
     if (!destination) return
     const { index: sourceIndex, droppableId: sourceId } = source
 
@@ -53,7 +63,21 @@ function TodoContent({}: Props) {
         destIndex: destIndex,
       }),
     )
+
+    const serverResponse = await changeTodoStateInServer(draggableId, destinationId)
+    if (!serverResponse) {
+      setAlertOpen(true)
+    }
+    setRefresh(!refresh)
   }
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
 
   return (
     <>
@@ -67,12 +91,12 @@ function TodoContent({}: Props) {
           paddingX: 5,
         }}
       >
-        <Button onClick={toggleModal} sx={{ alignSelf: 'flex-start', marginLeft: 5, marginTop: 5 }}>
-          New Task
+        <Button onClick={( ) => toggleModal()} sx={{ alignSelf: 'flex-start', marginLeft: 5, marginTop: 5 }}>
+          Add New Task
         </Button>
         <Modal
           open={addModalOpen}
-          onClose={toggleModal}
+          onClose={() => toggleModal()}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
@@ -96,12 +120,17 @@ function TodoContent({}: Props) {
           {winReady
             ? todoTypes.map((value, index) => (
                 <Paper key={index} sx={styles.flexPaper}>
-                  <DraggableList todoType={value} onDragEnd={onDragEnd} />
+                  <DraggableList todoType={value} onDragEnd={onDragEnd} refresh={refresh} />
                 </Paper>
               ))
             : null}
         </DragDropContext>
       </Box>
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose} >
+        <Alert onClose={handleClose} severity='error' sx={{ width: '100%' }}>
+          Sunucuda bir hata oluştu.Lütfen tekrar deneyiniz.
+        </Alert>
+      </Snackbar>
     </>
   )
 }
@@ -120,7 +149,7 @@ const styles: IStyles = {
   }),
   flexPaper: () => ({
     flex: 1 / 3,
-    margin: 5,
+    marginX: 5,
     alignSelf: 'center',
     backgroundColor: '#fff',
   }),

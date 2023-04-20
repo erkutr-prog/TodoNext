@@ -5,7 +5,7 @@ import { fetchTodos } from "@/utils/Storage";
 import { setTodos } from "@/features/todoSlice";
 import { useEffect, useState } from "react";
 
-export function useTodos(todoState: TodoStates) {
+export function useTodos(todoState: TodoStates, refresh: Boolean) {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<Boolean>(true)
   const [data, setData] = useState<ITodo[]>()
@@ -20,7 +20,7 @@ export function useTodos(todoState: TodoStates) {
 
   useEffect(() => {
     getTodoList()
-  }, [todoState])
+  }, [todoState, refresh])
 
   return {data, loading};
 }

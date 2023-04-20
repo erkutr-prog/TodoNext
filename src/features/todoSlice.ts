@@ -1,5 +1,5 @@
 import { DeleteTodoPayload, ITodo, SetTodoPayload, StateChangePayload } from "@/types"
-import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { PayloadAction, createSlice, current } from "@reduxjs/toolkit"
 
 export type TodoState = {
     newTodos: ITodo[],
@@ -8,36 +8,9 @@ export type TodoState = {
 }
 
 const initialState: TodoState = {
-    newTodos: [
-        {
-            id: '0',
-            header: 'Todo 1',
-            description: 'Some things 1',
-            state: 'new'
-        },
-    ],
-    onProgressTodos: [
-        {
-            id: '1',
-            header: 'Todo 2',
-            description: 'Some things 2',
-            state: 'onprogress'
-        },
-    ],
-    doneTodos: [
-        {
-            id: '2',
-            header: 'Todo 3',
-            description: 'Some things 3',
-            state: 'done'
-        },
-        {
-            id: '3',
-            header: 'Todo 4',
-            description: 'Some things 4',
-            state: 'done'
-        },
-    ]
+    newTodos: [],
+    onProgressTodos: [],
+    doneTodos: []
 }
 
 const todoSlice = createSlice({
@@ -48,33 +21,46 @@ const todoSlice = createSlice({
             state.newTodos.push(action.payload);
         },
         changeTodoState(state, action: PayloadAction<StateChangePayload>) {
-            var draggedItem: ITodo[] = [];
-            switch (action.payload.sourceId) {
-                case 'new':
-                    draggedItem = state.newTodos.splice(action.payload.sourceIndex, 1)
-                    break;
-                case 'onprogress':
-                    draggedItem = state.onProgressTodos.splice(action.payload.sourceIndex, 1)
-                    break;
-                case 'done':
-                    draggedItem = state.doneTodos.splice(action.payload.sourceIndex, 1)
-                    break;
-                default:
-                    break;
+            var draggedItem: ITodo = {
+                'description': '',
+                'id': '',
+                'docId': '',
+                'state': '',
+                'header': ''
             }
-            draggedItem[0].state = action.payload.destinationId;
-            switch (action.payload.destinationId) {
-                case 'new':
-                    state.newTodos.splice(action.payload.destIndex, 0, draggedItem[0]);
-                    break;
-                case 'onprogress':
-                    state.onProgressTodos.splice(action.payload.destIndex, 0, draggedItem[0])
-                    break;
-                case 'done':
-                    state.doneTodos.splice(action.payload.destIndex, 0, draggedItem[0])
-                    break;
-                default:
-                    break;
+            const { sourceId, destinationId, destIndex, sourceIndex } = action.payload
+            if (sourceId != destinationId) {
+                switch(sourceId) {
+                    case 'new':
+                        draggedItem = current(state.newTodos[sourceIndex])
+                        state.newTodos.splice(sourceIndex, 1);
+                        break;
+                    case 'onprogress':
+                        draggedItem = current(state.onProgressTodos[sourceIndex])
+                        state.onProgressTodos.splice(sourceIndex, 1);
+                        break;
+                    case 'done':
+                        draggedItem = current(state.doneTodos[sourceIndex])
+                        state.doneTodos.splice(sourceIndex, 1);
+                        break;
+                    default:
+                        break;
+                }
+                const draggedItemClone = {...draggedItem}
+                draggedItemClone['state'] = destinationId;
+                switch(destinationId) {
+                    case 'new':
+                        state.newTodos.splice(destIndex, 0, draggedItemClone);
+                        break;
+                    case 'onprogress':
+                        state.onProgressTodos.splice(destIndex, 0, draggedItemClone);
+                        break;
+                    case 'done':
+                        state.doneTodos.splice(destIndex, 0, draggedItemClone);
+                        break;
+                    default:
+                        break;
+                }
             }
         },
         setTodos(state, action: PayloadAction<SetTodoPayload>) {

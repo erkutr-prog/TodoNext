@@ -11,6 +11,7 @@ type Props = {
 }
 
 const initialTodoState: ITodo = {
+    docId: '',
     id: '',
     header: '',
     description: '',
@@ -49,11 +50,11 @@ export default function ModalForm({callback}: Props) {
         dispatch({type: 'setId', payload: user?.uid})
     }
 
-    const addNewTodo = () => {
+    const addNewTodo = async() => {
         setTodoId()
-        addTodoServer(state);
+        const serverResponse = await addTodoServer(state);
         addTodo(state)
-        callback()
+        callback(serverResponse)
     }
   return (
     <Box>
