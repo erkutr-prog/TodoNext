@@ -51,3 +51,5 @@ export interface AddTodoAction {
     type: 'setHeader' | 'setDescription' | 'setId',
     payload: string
 }
+
+export type TodoFieldNames  = 'docId' | 'id' | 'description' | 'header' | 'state'

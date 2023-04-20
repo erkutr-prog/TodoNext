@@ -6,7 +6,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/pages";
-import { ITodo, TodoStates } from "@/types";
+import { ITodo, TodoFieldNames, TodoStates } from "@/types";
 import { getAuth } from "firebase/auth";
 
 const fetchTodos = async (state: TodoStates) => {
@@ -36,6 +36,7 @@ const addTodoServer = async (todo: ITodo) => {
     const docRef = await addDoc(collection(db, "todos"), {
       todo,
     });
+    await changeTodoFieldInServer(docRef.id, docRef.id, 'docId')
     return true;
   } catch (e) {
     console.log("Something went wrong :(");
@@ -43,14 +44,15 @@ const addTodoServer = async (todo: ITodo) => {
   }
 };
 
-const changeTodoStateInServer = async (
+const changeTodoFieldInServer = async (
   docId: string,
-  newState: TodoStates | string
+  newValue: TodoStates | string,
+  todoField: TodoFieldNames | string
 ) => {
   try {
-    const response = await updateDoc(doc(db, "todos", docId), {
-      "todo.state": newState,
-    });
+    var data: any = {}
+    data[`todo.${todoField}` as keyof TodoFieldNames] = newValue
+    const response = await updateDoc(doc(db, "todos", docId), data);
     return true;
   } catch (e) {
     return false;
@@ -60,5 +62,5 @@ const changeTodoStateInServer = async (
 export {
   fetchTodos,
   addTodoServer,
-  changeTodoStateInServer
+  changeTodoFieldInServer
 }

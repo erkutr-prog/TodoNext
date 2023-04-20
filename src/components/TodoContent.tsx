@@ -16,7 +16,7 @@ import { AppDispatch } from '@/store'
 import { changeTodoState } from '@/features/todoSlice'
 import { getAuth, signOut } from 'firebase/auth'
 import ModalForm from './ModalForm'
-import { changeTodoStateInServer } from '@/utils/Storage'
+import { changeTodoFieldInServer } from '@/utils/Storage'
 
 const todoTypes: TodoStates[] = ['new', 'onprogress', 'done']
 
@@ -64,7 +64,7 @@ function TodoContent({}: Props) {
       }),
     )
 
-    const serverResponse = await changeTodoStateInServer(draggableId, destinationId)
+    const serverResponse = await changeTodoFieldInServer(draggableId, destinationId, 'state')
     if (!serverResponse) {
       setAlertOpen(true)
     }
