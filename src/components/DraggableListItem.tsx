@@ -23,7 +23,6 @@ export default function DraggableListItem({ item, index, deleteCb }: Props) {
   const {itemState} = useTodoState(item.state, item.id);
 
   const deleteItem = () => {
-    console.log("**************deletecb", deleteCb)
     deleteCb(index, item.state, item.docId);
   }
 

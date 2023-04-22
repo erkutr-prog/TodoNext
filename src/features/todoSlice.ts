@@ -84,7 +84,6 @@ const todoSlice = createSlice({
                 const serverResponse = await deleteTodoFromServer(docId);
                 return serverResponse
             }
-            console.log("******action.payload", action.payload);
             const {
                 todoType,
                 index,
@@ -104,7 +103,6 @@ const todoSlice = createSlice({
                     break;
             }
             const response = deleteFromServer(docId)
-            console.log("******response", response);
         }
     }, 
     extraReducers: {}

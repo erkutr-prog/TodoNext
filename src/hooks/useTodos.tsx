@@ -9,7 +9,6 @@ export function useTodos(todoState: TodoStates, refresh: Boolean) {
   const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState<Boolean>(true)
   const [data, setData] = useState<ITodo[]>()
-  console.log("******customhook")
   const getTodoList = async() => {
     setLoading(true)
     const response = await fetchTodos(todoState);
