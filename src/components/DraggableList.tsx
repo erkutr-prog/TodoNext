@@ -12,7 +12,8 @@ import Spinner from './Spinner'
 export type DraggableListProps = {
   todoType: TodoStates
   onDragEnd: OnDragEndResponder,
-  refresh: Boolean
+  refresh: Boolean,
+  deleteCb: Function
 }
 
 const ListHeaders = {
@@ -21,7 +22,7 @@ const ListHeaders = {
   'done': 'Done Tasks'
 }
 
-const DraggableList = ({ onDragEnd, todoType, refresh }: DraggableListProps) => {
+const DraggableList = ({ onDragEnd, todoType, refresh, deleteCb }: DraggableListProps) => {
   const { data, loading } = useTodos(todoType, refresh)
   return (
     <Box sx={styles.container}>
@@ -41,7 +42,7 @@ const DraggableList = ({ onDragEnd, todoType, refresh }: DraggableListProps) => 
             ) : (
               <>
                 {data?.map((item, index) => (
-                  <DraggableListItem item={item} index={index} key={item.docId} />
+                  <DraggableListItem deleteCb={deleteCb} item={item} index={index} key={item.docId} />
                 ))}
               </>
             )}

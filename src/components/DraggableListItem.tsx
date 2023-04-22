@@ -1,21 +1,33 @@
 import { ITodo } from "@/types";
-import { Avatar, Box, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import { Avatar, Box, Button, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import NotStartedIcon from '@mui/icons-material/NotStarted';
 import BeenhereIcon from '@mui/icons-material/Beenhere';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { colors } from "@/assets/colors";
 import { useTodoState } from "@/hooks/useTodoState";
-
+import { deleteTodo } from "@/features/todoSlice";
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from "@/store";
 
 type Props = {
   item: ITodo;
   index: number;
+  deleteCb: Function
 };
 
-export default function DraggableListItem({ item, index }: Props) {
+export default function DraggableListItem({ item, index, deleteCb }: Props) {
+  const dispatch = useDispatch<AppDispatch>()
   const {itemState} = useTodoState(item.state, item.id);
+
+  const deleteItem = () => {
+    console.log("**************deletecb", deleteCb)
+    deleteCb(index, item.state, item.docId);
+  }
+
+
   return (
     <Draggable key={item.docId} draggableId={item.docId} index={index}>
       {(provided, snapshot) => (
@@ -38,6 +50,9 @@ export default function DraggableListItem({ item, index }: Props) {
                 primary={item.header}
                 secondary={item.description}
               />
+              <Button onClick={() => deleteItem()}>
+                <DeleteIcon sx={{ display: 'flex', color: 'red'}}/>
+              </Button>
             </ListItem>
         </Box>
       )}

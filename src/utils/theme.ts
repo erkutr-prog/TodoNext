@@ -1,4 +1,4 @@
-import { Inter } from "@next/font/google";
+import { Inter } from "next/font/google";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
 export const inter = Inter({

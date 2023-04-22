@@ -30,7 +30,8 @@ export type StateChangePayload = {
 
 export type DeleteTodoPayload = {
     index: number,
-    todoType: TodoStates | string
+    todoType: TodoStates | string,
+    docId: string
 }
 
 export interface CredentialAction {

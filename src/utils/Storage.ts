@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   updateDoc,
@@ -59,8 +60,20 @@ const changeTodoFieldInServer = async (
   }
 };
 
+const deleteTodoFromServer = async (
+  docId: string
+) => {
+  try {
+    const response = await deleteDoc(doc(db, 'todos', docId));
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
 export {
   fetchTodos,
   addTodoServer,
-  changeTodoFieldInServer
+  changeTodoFieldInServer,
+  deleteTodoFromServer
 }

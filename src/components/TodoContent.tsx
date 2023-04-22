@@ -2,6 +2,11 @@ import {
   Alert,
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Modal,
   Snackbar,
   Theme,
@@ -13,10 +18,11 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import dynamic from 'next/dynamic'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/store'
-import { changeTodoState } from '@/features/todoSlice'
+import { changeTodoState, deleteTodo } from '@/features/todoSlice'
 import { getAuth, signOut } from 'firebase/auth'
 import ModalForm from './ModalForm'
 import { changeTodoFieldInServer } from '@/utils/Storage'
+import { DeleteTodoPayload } from "@/types"
 
 const todoTypes: TodoStates[] = ['new', 'onprogress', 'done']
 
@@ -30,6 +36,9 @@ function TodoContent({}: Props) {
   const [refresh, setRefresh] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [alertOpen, setAlertOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<DeleteTodoPayload>()
+
   const toggleModal = (response?: Boolean) => {
     setAddModalOpen(!addModalOpen)
     if (response !== undefined && !response) {
@@ -69,6 +78,20 @@ function TodoContent({}: Props) {
       setAlertOpen(true)
     }
     setRefresh(!refresh)
+  }
+
+  const deleteItemDialog = (index: number, todoType: TodoStates, docId: string) => {
+    setDialogOpen(true)
+    setSelectedItem({index: index, todoType: todoType, docId: docId})
+  }
+
+  const handleDeleteDialogAgree = () => {
+    if (selectedItem !== undefined) {
+      dispatch(deleteTodo(selectedItem));
+      setRefresh(!refresh)
+      setSelectedItem(undefined)
+    }
+    setDialogOpen(false)
   }
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -115,12 +138,33 @@ function TodoContent({}: Props) {
           </Box>
         </Modal>
       </Box>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Warning!"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete the selected item?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>No</Button>
+          <Button onClick={handleDeleteDialogAgree} autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box sx={styles.container}>
         <DragDropContext onDragEnd={onDragEnd}>
           {winReady
             ? todoTypes.map((value, index) => (
                 <Paper key={index} sx={styles.flexPaper}>
-                  <DraggableList todoType={value} onDragEnd={onDragEnd} refresh={refresh} />
+                  <DraggableList deleteCb={deleteItemDialog} todoType={value} onDragEnd={onDragEnd} refresh={refresh} />
                 </Paper>
               ))
             : null}

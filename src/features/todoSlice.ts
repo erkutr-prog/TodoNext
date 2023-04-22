@@ -1,4 +1,5 @@
 import { DeleteTodoPayload, ITodo, SetTodoPayload, StateChangePayload } from "@/types"
+import { deleteTodoFromServer } from "@/utils/Storage"
 import { PayloadAction, createSlice, current } from "@reduxjs/toolkit"
 
 export type TodoState = {
@@ -77,6 +78,33 @@ const todoSlice = createSlice({
                 default:
                     break
             }
+        },
+        deleteTodo(state, action: PayloadAction<DeleteTodoPayload>) {
+            async function deleteFromServer(docId: string) {
+                const serverResponse = await deleteTodoFromServer(docId);
+                return serverResponse
+            }
+            console.log("******action.payload", action.payload);
+            const {
+                todoType,
+                index,
+                docId
+            } = action.payload
+            switch(todoType) {
+                case 'new':
+                    state.newTodos.splice(index, 1)
+                    break;
+                case 'onprogress':
+                    state.onProgressTodos.splice(index, 1)
+                    break;
+                case 'done':
+                    state.doneTodos.splice(index, 1)
+                    break;
+                default:
+                    break;
+            }
+            const response = deleteFromServer(docId)
+            console.log("******response", response);
         }
     }, 
     extraReducers: {}
@@ -85,7 +113,8 @@ const todoSlice = createSlice({
 export const {
     addTodo,
     changeTodoState,
-    setTodos
+    setTodos,
+    deleteTodo
 } = todoSlice.actions
 
 export default todoSlice.reducer
