@@ -92,7 +92,7 @@ export default function Home() {
               {isLoggedIn ? (
                 <>
                   <UIOverlay />
-                  <Toolbar />
+                  {/* <Toolbar /> */}
                   <TodoContent />
                 </>
               ) : (

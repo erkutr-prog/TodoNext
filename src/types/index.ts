@@ -35,13 +35,19 @@ export type DeleteTodoPayload = {
 }
 
 export interface CredentialAction {
-    type: 'setMail' | 'setPassword',
+    type: 'setMail' | 'setPassword' | 'setRegisterName' | 'setRegisterMail' | 'setRegisterPassword',
     payload: string
 }
 
-export interface CredentialState {
+export interface LoginCredentialState {
     mail: string,
-    password: string
+    password: string,
+}
+
+export interface RegisterCredentialState {
+    name: string,
+    mail: string,
+    password: string,
 }
 
 export interface IStyles {

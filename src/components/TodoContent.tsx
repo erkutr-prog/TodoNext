@@ -22,7 +22,8 @@ import { changeTodoState, deleteTodo } from '@/features/todoSlice'
 import { getAuth, signOut } from 'firebase/auth'
 import ModalForm from './ModalForm'
 import { changeTodoFieldInServer } from '@/utils/Storage'
-import { DeleteTodoPayload } from "@/types"
+import { DeleteTodoPayload } from '@/types'
+import CustomDialog from './CustomDialog'
 
 const todoTypes: TodoStates[] = ['new', 'onprogress', 'done']
 
@@ -35,8 +36,8 @@ function TodoContent({}: Props) {
   const [winReady, setWinReady] = useState(false)
   const [refresh, setRefresh] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<DeleteTodoPayload>()
 
   const toggleModal = (response?: Boolean) => {
@@ -58,7 +59,11 @@ function TodoContent({}: Props) {
     setWinReady(true)
   }, [])
 
-  const onDragEnd = async({ destination, source, draggableId }: DropResult) => {
+  const onDragEnd = async ({
+    destination,
+    source,
+    draggableId,
+  }: DropResult) => {
     if (!destination) return
     const { index: sourceIndex, droppableId: sourceId } = source
 
@@ -73,34 +78,45 @@ function TodoContent({}: Props) {
       }),
     )
 
-    const serverResponse = await changeTodoFieldInServer(draggableId, destinationId, 'state')
+    const serverResponse = await changeTodoFieldInServer(
+      draggableId,
+      destinationId,
+      'state',
+    )
     if (!serverResponse) {
       setAlertOpen(true)
     }
     setRefresh(!refresh)
   }
 
-  const deleteItemDialog = (index: number, todoType: TodoStates, docId: string) => {
+  const deleteItemDialog = (
+    index: number,
+    todoType: TodoStates,
+    docId: string,
+  ) => {
     setDialogOpen(true)
-    setSelectedItem({index: index, todoType: todoType, docId: docId})
+    setSelectedItem({ index: index, todoType: todoType, docId: docId })
   }
 
   const handleDeleteDialogAgree = () => {
     if (selectedItem !== undefined) {
-      dispatch(deleteTodo(selectedItem));
+      dispatch(deleteTodo(selectedItem))
       setRefresh(!refresh)
       setSelectedItem(undefined)
     }
     setDialogOpen(false)
   }
 
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
     if (reason === 'clickaway') {
-      return;
+      return
     }
 
-    setAlertOpen(false);
-  };
+    setAlertOpen(false)
+  }
 
   return (
     <>
@@ -112,9 +128,13 @@ function TodoContent({}: Props) {
           justifyContent: 'center',
           alignItems: 'flex-end',
           paddingX: 5,
+          marginTop: 10
         }}
       >
-        <Button onClick={( ) => toggleModal()} sx={{ alignSelf: 'flex-start', marginLeft: 5, marginTop: 5 }}>
+        <Button
+          onClick={() => toggleModal()}
+          sx={{ alignSelf: 'flex-start', marginLeft: 5, marginTop: 5 }}
+        >
           Add New Task
         </Button>
         <Modal
@@ -123,7 +143,8 @@ function TodoContent({}: Props) {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
-          <Box sx={{
+          <Box
+            sx={{
               position: 'absolute' as 'absolute',
               top: '50%',
               left: '50%',
@@ -133,45 +154,37 @@ function TodoContent({}: Props) {
               border: '2px solid #000',
               boxShadow: 24,
               p: 4,
-          }}>
-            <ModalForm callback={toggleModal}/>
+            }}
+          >
+            <ModalForm callback={toggleModal} />
           </Box>
         </Modal>
       </Box>
-      <Dialog
+      <CustomDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Warning!"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete the selected item?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>No</Button>
-          <Button onClick={handleDeleteDialogAgree} autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+        handleAgree={handleDeleteDialogAgree}
+        content="Are you sure you want to delete this item?"
+        header="Warning"
+        dialogToggle={setDialogOpen}
+      />
       <Box sx={styles.container}>
         <DragDropContext onDragEnd={onDragEnd}>
           {winReady
             ? todoTypes.map((value, index) => (
                 <Paper key={index} sx={styles.flexPaper}>
-                  <DraggableList deleteCb={deleteItemDialog} todoType={value} onDragEnd={onDragEnd} refresh={refresh} />
+                  <DraggableList
+                    deleteCb={deleteItemDialog}
+                    todoType={value}
+                    onDragEnd={onDragEnd}
+                    refresh={refresh}
+                  />
                 </Paper>
               ))
             : null}
         </DragDropContext>
       </Box>
-      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose} >
-        <Alert onClose={handleClose} severity='error' sx={{ width: '100%' }}>
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
           Sunucuda bir hata oluştu.Lütfen tekrar deneyiniz.
         </Alert>
       </Snackbar>
