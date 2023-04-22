@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
+import LogoutIcon from '@mui/icons-material/Logout';
 import { getAuth, signOut } from 'firebase/auth'
 
 interface IStyles {
@@ -75,8 +76,10 @@ function CustomAppBar({}: Props) {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={logout}>Logout</MenuItem>
+            <MenuItem onClick={logout}>
+              <LogoutIcon/>
+              Logout
+            </MenuItem>
           </Menu>
         </div>
       </Toolbar>
